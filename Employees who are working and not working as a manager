@@ -1,0 +1,23 @@
+==============================not working=================
+
+  1  select e.employee_id, e.first_name
+  2  from employees e
+  3  where not exists (select 1 from employees m
+  4* where e.manager_id= m.employee_id)
+SQL> /
+
+EMPLOYEE_ID FIRST_NAME
+----------- --------------------
+        217
+        222
+        100 Steven
+     999999
+
+SQL>
+===============================================================
+
+  1  select e.employee_id, e.first_name
+  2  from employees e
+  3  where exists (select 1 from employees m
+  4* where e.manager_id= m.employee_id)
+SQL> /
