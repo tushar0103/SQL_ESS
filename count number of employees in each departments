@@ -1,0 +1,19 @@
+  1  SELECT *
+  2  FROM (
+  3          SELECT e.department_id, d.department_name, COUNT(e.employee_id) AS employee_count
+  4          FROM employees e
+  5          JOIN departments d ON e.department_id = d.department_id
+  6          GROUP BY e.department_id, d.department_name
+  7          ORDER BY COUNT(e.employee_id) DESC
+  8      )
+  9*     WHERE ROWNUM < 5
+ 10  /
+
+DEPARTMENT_ID DEPARTMENT_NAME                EMPLOYEE_COUNT
+------------- ------------------------------ --------------
+           50 Shipping                                   44
+           80 Sales                                      35
+           30 Purchasing                                  6
+          100 Finance                                     6
+
+SQL> ed
