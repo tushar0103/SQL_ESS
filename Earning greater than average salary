@@ -1,0 +1,14 @@
+  1  SELECT e.department_id,
+  2         d.department_name,
+  3         e.salary
+  4  FROM employees e,
+  5       departments d,
+  6       (SELECT department_id,
+  7               AVG(salary) AS avg_sal
+  8        FROM employees
+  9        GROUP BY department_id) dep
+ 10  WHERE e.department_id = d.department_id
+ 11    AND e.department_id = dep.department_id
+ 12    AND e.salary > dep.avg_sal
+ 13* ORDER BY dep.avg_sal
+SQL> /
