@@ -1,0 +1,133 @@
+Test -SQL - Total time - 1 hour   Total marks 12
+Please write answers below the questions.
+****************************Q1. There are 3 users named sales, Purchase and Inventory. In inventory there is a stock summary    table. Purchase and Sales users wants to access stock summary table (which is currently not accessible) also if any purchasing and selling will be done update can also be performed on stock summary table how to achieve this task?
+ Write appropriate statement for it.(Mark 2)
+Ans: 
+Grant inventory.stock_summary to (purchase, sales);
+
+Grant update on stock_summary to (purchase,sales); 
+
+
+
+
+**************************** Q2. I) Write the command to create a view called viewname containing columns-
+          employee_id,employee name,department name,job id,job title,city,country name.(Mark 1)
+        ii) Also mention this view comes under which category and why? (Mark 1)
+
+Ans:  create view viewname  as select e.employee_id, e.last_name, d.department_name, j.job_id,j.job_title,l.city, c.country_name from employees e, departments d, jobs j, locations l, countries c where e.department_id=d.department_id
+And e.job_id=j.job_id
+And d.location_id=l.location_id
+And l.country_id=c.country_id;
+
+ii) this is a complex view because it contains joins operations.
+
+
+
+
+
+****************************Q3. Write a query to display the short string starting from  2nd  occurrence of  alphabet ‘s’  till end from the string   ‘Eastern Software Solutions pvt ltd’.
+Ans: select substr('Eastern Software Solutions pvt ltd', instr('Eastern Software Solutions pvt ltd','s', 1,2)) from dual;
+
+
+****************************
+Q4. Create table SALES_SUMMARY table as follows: (Mark 2)
+	  create table sales_summary
+                (Sales_Year   Number(4) Primary Key,
+        	   Yearly_Total  Number(10) );
+      	(a) Insert the following data into the table
+	Sales_Year	Yearly_Total
+	2008	        10000
+              2009	        11000
+              2010	         9000
+              2011	         8000
+Ans: create table sales_summary(
+sales_year number(4) constraint pk_id primary key,
+yearly_total number(10));
+
+
+Ans.   Insert into sales_summary
+Values(2008,10000);
+Insert into sales_summary
+Values(2009,11000);
+Insert into sales_summary
+Values(2010,9000);
+Insert into sales_summary
+Values(2011,8000);
+Commit;
+
+
+	(b) Write a query to show the output in the following format:
+
+	2008	2009	2010	2011   Total
+	10000	11000	9000	8000   38000
+
+Ans:  Select max(case sales_year when 2008 then 10000 else 0 end)"2008",
+max(case sales_year when 2009 then 11000 else 0 end)"2009",
+max(case sales_year when 2010 then 9000 else 0 end)"2010",
+max(case sales_year when 2011 then 8000 else 0 end)"2011",
+Sum(yearly_total) total from sales_summary;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****************************
+Q5. Using the cycle and cache (next 2 numbers) option write the command to 
+Create a sequence sequence_name. Also specify it will start from which number when it will reach at maximum value.(Marks 2)
+Ans:
+Create sequence seq50 
+Increment by 2
+Start with 100 
+Maxvalue 500
+Cycle;
+
+ 
+
+It will start again from 100 when it reaches to maxvalue i.e. 500
+
+
+
+
+
+
+
+
+
+****************************
+Q6. Write a query to display employees who are not working as managers (using Not exists operator). (Marks 2)
+Ans:
+
+ select e.* from employees e where not exists (select 1 from employees m where e.manager_id=m.employee_id);
+
+
+
+
+
+
+
+****************************
+Q7. Write a query to display city and location id where mostly employees are working. (Mark 1)
+Ans: select l.city, l.location_id from locations l where l.location_id=(select d.location_id from departments d where d.department_id in (select max(count(employee_id) from employees e where d.department_id=d.department_id));
+
+
+
+
+
+
+
+
+
+
+
+
+****************************…
