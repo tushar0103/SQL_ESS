@@ -1,0 +1,127 @@
+
+**************************** 
+Q2. Using the cycle option write the command to 
+create a sequence sequence_name, with a start value of 101 and end value of 200 and  increment value is 2. Also specify it will start from which number when it will reach at maximum value.
+Also specify Data Dictionary View name from where you can get information regarding sequence. (Marks 2)
+Ans:  CREATE SEQUENCE SEQUENCE_NAME
+START WITH 101
+INCREMENT BY 2
+MIN VALUE  10
+MAX VALUE 200
+CYCLE
+CACHE 8;
+DATA DICTIONERY VIEW NAME- USER SEQUENCES
+
+
+
+
+
+
+
+
+
+
+*************************** 
+
+Q3. Write a statement to                (Marks- 3)
+(I)Create a master table for saving supplier master records.
+    Table Name: MST_SUPPLIER 
+     Columns
+    vc_supplier_code   	character    size (10),
+    vc_supplier_name	character    size (30),
+    vc_address 		character    size (10),
+    nu_credit_limit	number size (10),
+ch_active		char(1)
+
+CREATE TABLE MST_SUPPLIER (
+VC_SUPPLIER_CODE VARCHAR2(10),
+VC_SUPPLIER_NAME VARCHAR2(30),
+VC_ADDRESS VARCHAR2(10),
+NU_CREDIT_LIMIT NUMBER(10),
+CH-ACTIVE VARCHAR(1) );
+
+(II)create a header table for saving the record for purchase order with following structure.
+    Table name    HD_PURCHASE 
+   columns
+    vc_po_code        character    size (10) --- purchase order number
+    vc_comp_code      character size (2),
+    vc_supplier_code    character size (10),
+    ch_purchase_type    char(2)          --- cash -  CA,  credit - CR
+    nu_po_amount    number size (10,2),
+    nu_paid_amount	number size (10,2),
+    dt_purchase_date	date
+);
+
+CREATE HD_PURCHASE (
+VC_PO_CODE VARCHAR2(10),
+VC_COMP_CODE VARCHAR(2),
+VC_SUPPLIER_CODE VARCHAR(10),
+CH_PURCHASE_TYPE VARCHAR(2),
+NU_PO_AMOUNT NUMBER(10,2),
+NU_PAID_AMOUNT NUMBER(10,2),
+DT_PURCHASE_DATE DATE )
+CONSTRAINTS PK_ST_ID PRIMARY_KEY (VC_PO_CODE, VC_COMP_CODE);
+After the table creation add constraint as mentioned below:
+(III)create a composite primary key based on 2 column vc_po_code and vc_comp_code.
+(IV)Apply appropriate constraint on vc supplier code column so that it will only accept mst suppliers vc_supplier code.
+
+
+
+     
+
+
+*************************
+
+
+*************************
+Q4. Write a query to find all the employees who earn more than average salary in their departments.
+Display last name, salary, department id and the average salary for the department. Sort by   average salary. Give proper alias. (Marks 2)
+Ans:   SELECT e.last_name AS "Last Name",
+          e.salary,
+          e.department_id AS "Department ID",
+         d.avg_salary AS "Average Salary"
+FROM EMPLOYEES e
+JOIN (SELECT department_id,
+           Avg(salary) AS avg_salary
+           FROM EMPLOYEES
+          GROUP BY department_id) d ON e.department_id = d.department_id
+WHERE e.salary > d.avg_salary
+ORDER BY d.avg_salary;
+
+
+
+
+
+
+
+
+
+
+
+****************************
+Q5. Write a query to display the last name ,hire date and salary for all the employees who have the same salary and commission as kochhar. (Mark 1)
+Ans:   SELECT LAST_NAME, HIRE_DATE, SALARY 
+FROM EMPLOYEES
+WHERE SALARY , COMMISSION IN (SELECT SALARY, COMMISSION
+FROM EMPLOYEES)
+GROUP BY SALARY, COMMISSION
+HAVING COUNT() >1 );
+
+
+
+
+
+
+
+****************************Q6. If employee has joined the company before July month than display review date as same year’s first date and if joining is after June month than display review date as next year’s first date as review date. (Mark 2)
+Ans:  SELECT EMPLOYEE_ID,  JOIN_DATE,
+         CASE WHEN TO_CHAR(JOIN_DATE, 'MM') <= '06' THEN TO_DATE(TO_CHAR(JOIN_DATE, 'YYYY') || '-07-01', 'YYYY-MM-DD')
+         ELSE TO_DATE(TO_CHAR(JOIN_DATE, 'YYYY') + 1 || '-07-01', 'YYYY-MM-DD')
+          END AS REVIEW_DATE
+FROM EMPLOYEES;
+
+
+
+
+
+****************************
