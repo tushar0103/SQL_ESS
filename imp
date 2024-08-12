@@ -1,0 +1,13 @@
+Write a query to retrieve the sales employees and their current year’s budgets. If the budget of the current year is the same as the previous year’s, it should return a literal string “Same as last year”.
+(use nullif function)
+
+Ans:  select
+    nu_s_id,
+    nu_curr_year as current_year_budget,
+    case
+        when nullif(nu_curr_year, nu_prev_year) is null then 'same as last year'
+        else to_char(nu_curr_year)
+    end as budget_comparison
+from
+    budget
+/
