@@ -1,0 +1,153 @@
+Test -SQL - Total time - 1 hour   Total marks 12
+
+Please write answers below the questions.
+****************************Q1. Inventory user has given permission to sales to access and modify stock summary table and wants sales user can also pass on the permission to other user.
+Write appropriate statement for it. (Marks 2)
+Ans: grant select, insert, update, delete on stock_summary to sales with grant option;
+
+
+****************************
+Q2. Write the command to create an index index_1 on (last_name) of employees table. (Mark 1)
+
+Ans:  create index index1
+on employees (last_name)
+/
+
+
+
+
+****************************Q3. Write statement to create a table    (Marks 3)
+(I)Table name budget
+Column:
+                    Nu_s_id      primary key constraint
+                    Dt_fin_year
+                    Nu_curr_year     
+                   Nu_prev_year 
+create table budget
+(
+    nu_s_id         number(5) not null,
+    dt_fin_year     date,
+    nu_curr_year    number(5),
+    nu_prev_year    number(5),
+    constraint pk_s_id primary key (nu_s_id)
+)
+SQL> /
+
+Table created.
+
+Commit ;
+
+
+(II)
+Put following values in the table to permanently create 5 rows.
+(54,2017,120000, 100000)
+(55,2017,200000, 200000;  
+(56,2017,NULL, 150000) 
+(57,2017,175000, 175000)  
+(58,2017,220000, 200000)
+
+  1* insert into budget values (54,to_date(2017 , 'yyyy'),120000, 100000)
+SQL> /
+
+1 row created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into budget values (55,to_date(2017 , 'yyyy'),200000, 200000)
+SQL> /
+
+1 row created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into budget values (56,to_date(2017 , 'yyyy'),null, 150000)
+SQL> /
+
+1 row created.
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into budget values (57,to_date(2017 , 'yyyy'),175000, 175000)
+SQL> /
+
+1 row created.
+  1* insert into budget values (58,to_date(2017 , 'yyyy'),220000, 200000)
+SQL> /
+
+1 row created.
+
+
+(III)
+Write a query to retrieve the sales employees and their current year’s budgets. If the budget of the current year is the same as the previous year’s, it should return a literal string “Same as last year”.
+(use nullif function)
+
+Ans:  select
+    nu_s_id,
+    nu_curr_year as current_year_budget,
+    case
+        when nullif(nu_curr_year, nu_prev_year) is null then 'same as last year'
+        else to_char(nu_curr_year)
+    end as budget_comparison
+from
+    budget
+/
+
+        
+
+
+
+****************************
+Q4. Write a query to display employee id, Last Name, manager name from employees table, whose manager has joined the company on any Monday or Wednesday. Sort the result by day of the week Wednesday should come first.(Marks 2) 
+Ans:
+ 1  select e.employee_id, e.last_name, m.employee_id, m.last_name, to_char(m.hire_date, 'DAY')
+  2  from employees e, employees m
+  3  where e.manager_id = m.employee_id
+  4* and trim(to_char(m.hire_date, 'DAY')) in ('WEDNESDAY', 'MONDAY')
+
+
+OR 
+
+select e1.employee_id, e1.last_name, e2.last_name as manager_name , to_char(e2.hire_date, 'dy')
+from employees e1, employees e2
+where e1.manager_id = e2.employee_id
+and to_char(e2.hire_date, 'dy', 'nls_date_language=english') in ('mon', 'wed')
+order by case when to_char(e2.hire_date, 'dy', 'nls_date_language=english') = 'wed' then 1 else 2 end
+/
+ 
+         
+
+
+****************************
+Q5. Create a query to display the employees who earn a salary that is higher than the salary of all sales managers (job_id = ‘SA_MAN’).Sort the result on salary from highest to lowest. (Marks 2) 
+
+Ans:
+
+select employee_id, last_name, salary
+from employees
+where salary > (
+    select max(salary)
+    FROM employees
+    WHERE job_id = 'SA_MAN'
+)
+ORDER BY salary DESC
+/
+
+
+
+
+****************************
+Q6. Write a query to display employee id, last name who earn less than the average salary in their jobs(job_id). (Marks 2)
+select employee_id, last_name
+from employees
+where salary < (
+    select avg(salary)
+    from employees e2
+    where e2.job_id = employees.job_id
+)
+/
+
+
+
