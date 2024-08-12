@@ -1,0 +1,10 @@
+
+SQL> select employee_id,
+  2  floor(months_between(sysdate, hire_date)/12) as "year",
+  3  floor(mod(months_between(sysdate, hire_date),12)) as "months",
+  4  floor(sysdate- add_months(hire_date,trunc(months_between(sysdate,hire_date)))) as "day"
+  5  from employees;
+
+EMPLOYEE_ID       year     months        day
+----------- ---------- ---------- ----------
+        217          3          5          7
