@@ -1,0 +1,9 @@
+SQL> select
+  2  substr('eastern software solutions',INSTR('eastern software solutions','s',1,2), LENGTH('eastern software solutions')-INSTR('eastern software solutions','s',1,2)+1)
+  3  from dual;
+
+SUBSTR('EASTERNSOF
+------------------
+software solutions
+
+SQL>
