@@ -1,0 +1,260 @@
+
+select
+    (select count(*) from employees where salary > 15000) high,
+    (select count(*) from employees where salary between 10000 and 15000) medium,
+    (select count(*) from employees where salary < 10000) low
+    from dual
+    ;
+
+      HIGH     MEDIUM        LOW
+---------- ---------- ----------
+         4          5        100
+
+
+
+
+-------------------clauses
+
+The TOP clause in SQL is used to limit the number of rows returned by a query, allowing you to retrieve only a specified number of rows from the result set. It's commonly used to get the first few rows based on certain criteria.
+
+SELECT TOP 5 * FROM employees
+ORDER BY salary DESC;
+
+or
+
+question : Get the Top 3 Departments with the Highest Average Salary
+sql
+Copy code
+SELECT TOP 3 
+    department_id,
+    AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id
+ORDER BY avg_salary DESC;
+
+
+----------------------------------------------------Using the ANY and ALL Operators--------------------------------
+
+question
+ Find Employees Whose Salary is Higher Than Any Employee in Department 10
+
+answer 
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE salary > ANY (SELECT salary FROM employees WHERE department_id = 10);
+
+
+
+question
+Find Employees Whose Salary is Greater Than the Salaries of All Employees in Any Department with More Than 5 Employees
+
+SELECT employee_id, first_name, last_name, salary
+FROM employees e
+WHERE salary > ALL (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE department_id IN (
+        SELECT department_id
+        FROM employees
+        GROUP BY department_id
+        HAVING COUNT(*) > 5
+    )
+    GROUP BY department_id
+);
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+for large data base in operator is inefficient you have to give all values as parameter
+
+
+The SQL EXISTS Operator
+The SQL EXISTS operator is used to verify whether a particular record exists in a table. 
+
+The EXISTS operator is used in the WHERE clause of a SELECT statement to filter records based on the existence of related records in another table.
+
+It returns a Boolean value TRUE or FALSE.
+
+It returns TRUE if the subquery returns at least one record.
+
+If the EXISTS operator returns TRUE, the outer query will get executed; otherwise not.
+
+
+SELECT department_id, department_name
+FROM departments d
+WHERE EXISTS (
+    SELECT 1
+    FROM employees e
+    WHERE e.department_id = d.department_id
+);
+
+
+
+find employees employee_id, first_name, last_name, salary    in departments where the average salary is above 6000
+
+select e.employee_id, e.first_name, e.last_name, e.salary
+from employees e
+where exists (
+    select 1
+    from employees e2
+    where e2.department_id = e.department_id
+    group by e2.department_id
+    having avg(e2.salary) > 6000
+)
+
+
+find employees  employee_id, first_name, last_name, salary who work in departments where the number of employees exceeds 10
+
+select e.employee_id, e.first_name, e.last_name, e.salary
+from employees e
+where exists (
+    select 1
+    from employees e2
+    where e2.department_id = e.department_id
+    group by e2.department_id
+    having count(*) > 10
+);
+
+
+find departments where all employees have non-null commission percentage
+
+select d.department_id, d.department_name
+from departments d
+where not exists (
+    select 1
+    from employees e
+    where e.department_id = d.department_id
+      and e.commission_pct is null
+);
+
+
+find employees who work in departments with at least one employee having a commission percentage greater than 5%
+
+
+select e.employee_id, e.first_name, e.last_name
+from employees e
+where exists (
+    select 1
+    from employees e2
+    where e2.department_id = e.department_id
+      and e2.commission_pct > 0.05
+);
+
+
+-----------------------
+find employees who have a salary that matches any salary of employees in a specific department (e.g., department 50)
+
+
+select e.employee_id, e.first_name, e.last_name, e.salary
+from employees e
+where e.salary in (
+    select salary
+    from employees
+    where department_id = 50
+);
+
+
+
+ find departments where the manager is one of the employees with a specific job id (e.g., 'IT_PROG' or 'SA_REP')
+
+
+select d.department_id, d.department_name
+from departments d
+where d.manager_id in (
+    select e.employee_id
+    from employees e
+    where e.job_id in ('IT_PROG', 'SA_REP')
+);
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+case
+
+determine bonus eligibility based on job role and tenure
+
+select 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.job_id,
+    case 
+        when e.job_id = 'IT_PROG' and months_between(sysdate, e.hire_date) > 36 then 'eligible'
+        when e.job_id = 'ST_CLERK' and months_between(sysdate, e.hire_date) > 36 then 'eligible'
+        else 'not eligible'
+    end as bonus_eligibility
+from employees e;
+
+
+---------------------------
+
+If employee has joined the company before July month than display review date as same year’s first date and if joining is after June month than display review date as next year’s first date as review date. (Mark 2)
+
+Ans:  SELECT EMPLOYEE_ID,  HIRE_DATE,
+         CASE WHEN TO_CHAR(HIRE_DATE, 'MM') <= '06' THEN TO_DATE(TO_CHAR(HIRE_DATE, 'YYYY') || '-07-01', 'YYYY-MM-DD')
+         ELSE TO_DATE(TO_CHAR(HIRE_DATE, 'YYYY') + 1 || '-07-01', 'YYYY-MM-DD')
+          END AS REVIEW_DATE
+FROM EMPLOYEES
+/
+
+----------------------------
+
+Write a query to retrieve the sales employees and their current year’s budgets. If the budget of the current year is the same as the previous year’s, it should return a literal string “Same as last year”.
+
+
+Ans:  select
+    nu_s_id,
+    nu_curr_year as current_year_budget,
+    case
+        when nullif(nu_curr_year, nu_prev_year) is null then 'same as last year'
+        else to_char(nu_curr_year)
+    end as budget_comparison
+from
+    budget
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
