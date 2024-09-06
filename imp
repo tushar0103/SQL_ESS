@@ -11,3 +11,23 @@ Ans:  select
 from
     budget
 /
+
+
+
+
+select 
+(select count(*) from employees where salary > 15000) high,
+(select count(*) from employees where salary between 10000 and 15000) medium,
+(select count(*) from employees where salary < 10000) low
+from dual
+
+
+
+output 
+
+SALARY   EMPLOYEE_COUNT
+
+low                    108
+high                     2
+medium               1
+
