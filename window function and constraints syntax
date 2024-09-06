@@ -1,0 +1,264 @@
+
+window function
+
+
+window function applies aggregiate functions over a specific rows;
+
+syntax
+
+select <column name> , fun() OVER([partition by clause]  [order by clause] [row or range clause])
+
+from <table name>
+
+
+OVER([partition by ]  [order by])
+
+PARTITION BY: This divides the result set into partitions (groups). The calculations will be done separately within each partition.
+
+OVER Clause: This specifies the window (or range) over which the function operates. It can include both PARTITION BY and ORDER BY clauses to define how the data is grouped and ordered.
+
+
+--------
+function like aggregiate functions , ranking functions
+
+
+Types of window function
+1 Aggregiate function =>  sum(), min(), max(), avg()
+2 Ranking function => row_number(), rank(), dense_rank(), percent_rank()
+
+
+
+
+==============================================================================================================================
+
+ Aggregiate function =>  sum(), min(), max(), avg()
+=============================================================================================================================
+
+select first_name, last_name , 
+sum(salary) over(partition by department_id   order by salary) as "department salary sum" ,
+avg(salary) over(partition by department_id) as avg_sal,
+ min(salary) over(partition by department_id) as min_sal,
+ max(salary) over(partition by department_id) as max_sal
+ from employees;
+
+
+-------------------
+question : employee salary as a percentage of total department salary:
+
+select department_id,
+       first_name,
+       last_name,
+       salary,
+       salary * 100.0 / sum(salary) over (partition by department_id) as salary_percentage
+from employees;
+
+
+
+======------------------------------
+
+
+ Calculate the Difference from the Average Salary in Each Department
+
+SELECT 
+    first_name,
+    salary,
+    department_id,
+    salary - AVG(salary) OVER (PARTITION BY department_id) AS salary_difference_from_avg
+FROM 
+    employees;
+
+
+
+
+
+================================================================================================================================
+
+2 Ranking function => row_number(), rank(), dense_rank(), percent_rank()
+question on this
+
+
+
+ROW_NUMBER(): Assigns a unique sequential integer to rows within a partition, starting at 1 for the first row.
+
+RANK(): Assigns a rank to rows within a partition, with the same rank given to rows with equal values. Ranks may have gaps.
+
+DENSE_RANK(): Similar to RANK(), but without gaps in ranking values for rows with the same value.
+
+PERCENT_RANK(): Calculates the relative rank of a row within its partition as a percentage.
+================================================================================================================================
+
+select first_name, last_name , 
+row_number() over(order by salary) as "row_number" ,
+rank() over(order by salary) as rank,
+ dense_rank() over(order by salary) as dense_rank,
+percent_rank() over(order by salary) as percent_rank
+ from employees;
+
+
+FIRST_NAME           LAST_NAME                     SALARY row_number       RANK DENSE_RANK PERCENT_RANK
+-------------------- ------------------------- ---------- ---------- ---------- ---------- ------------
+Sundita              Kumar                             61          1          1          1            0
+Amit                 Banda                             62          2          2          2   .009090909
+Charles              Johnson                           62          3          2          2   .009090909
+Sundar               Ande                              64          4          4          3   .027272727
+David                Lee                               68          5          5          4   .036363636
+Mattea               Marvins                           72          6          6          5   .045454545
+Oliver               Tuvault                        157.5          7          7          6   .054545455
+Elizabeth            Bates                         164.25          8          8          7   .063636364
+William              Smith                          166.5          9          9          8   .072727273
+                     v                                200         10         10          9   .081818182
+Danielle             Greene                        213.75         11         11         10   .090909091
+
+
+
+
+---------------------------------------------------------------------
+
+ Top 3 Highest Salaries per Department
+
+
+
+select department_id,
+       first_name,
+       last_name,
+       salary
+from (
+    select department_id,
+           first_name,
+           last_name,
+           salary,
+           row_number() over (partition by department_id order by salary desc) as rn
+    from employees
+) ranked
+where rn <= 3;
+
+=============================================================================================================================================================================================
+                                                                      Constraints
+=============================================================================================================================================================================================
+
+1: NOT NULL Constraint
+Ensures that a column cannot have a NULL value.
+
+
+example:
+create table example(
+id number(2) not null,
+name varchar2(20)
+);
+
+
+ALTER TABLE example
+MODIFY name NOT NULL;
+
+
+------------------------------------------
+2: DEFAULT Constraint
+
+
+create table example2(
+id number(5) default 101,
+name varchar2(20)
+);
+
+alter table example2 modify name default 'tushar';
+
+
+------------------------------------------
+
+create table example4(
+id number(5) unique,
+name varchar2(20)
+);
+
+ALTER TABLE example4
+ADD CONSTRAINT unique_name UNIQUE (name);
+
+-----------------------------------------primary key------------------
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    hire_date DATE
+);
+ or
+
+CREATE TABLE orders (
+    order_id INT,
+    customer_id INT,
+    order_date DATE,
+    PRIMARY KEY (order_id, customer_id)
+);
+
+
+or
+
+ALTER TABLE employees
+ADD CONSTRAINT pk_employee_id PRIMARY KEY (employee_id);
+
+
+
+-------------------------------------------------------FOREIGN Key
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+
+or
+
+ALTER TABLE employees
+ADD CONSTRAINT fk_department
+FOREIGN KEY (department_id)
+REFERENCES departments(department_id)
+
+
+------------------------------------------------------
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    salary DECIMAL(10, 2),
+    hire_date DATE,
+    CHECK (salary > 0)
+);
+
+
+
+or
+
+ALTER TABLE employees
+ADD CONSTRAINT check_salary_positive
+CHECK (salary > 0);
+
+==========================================================================================================================
+List All Tables in Your Schema
+
+SELECT table_name
+FROM user_tables;
+
+List All Tables in All Schemas
+SELECT owner, table_name
+FROM all_tables;
+
+
+
+RENAME TABLE table_name TO new_table_name;
+
+INSERT INTO BUYERS SELECT * FROM CUSTOMERS;
+
+
+=======================================================================================view =====================================
+
+  1  create view hire_before_mgf
+  2  as
+  3  select e.employee_id as "employee id ",e.first_name "employee name",e.last_name,e.hire_date " emp hire date",m.employee_id "manager id ",m.first_name "manager name",m.hire_date "mgr hir date"
+  4  from employees e, employees m
+  5  where e.manager_id=m.employee_id
+  6* and e.hire_date<m.hire_date
+SQL> /
+
+View created.
+
+
